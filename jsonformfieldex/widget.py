@@ -1,6 +1,6 @@
 from django.forms.widgets import Widget, Textarea
 from django.utils.safestring import mark_safe
-from django.utils.simplejson import dumps, loads, JSONDecodeError
+from django.utils.simplejson import dumps, loads
 from django.utils.datastructures import SortedDict as D
 from django.utils.translation import ugettext_lazy as _
 

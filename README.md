@@ -12,17 +12,17 @@ How it works?
 Basically, you define a dict of fields for your json data, and it will take care of the rest. Just like this:
 
     class MyCustomer(Form):
-        slug = fields.SlugField()
+        slug = SlugField()
         store = JSONFormFieldEx({
             "profile": {
-                "name": fields.CharField(max_length=10),
-    			"email": fields.EmailField,
+                "name": CharField(max_length=10),
+    			"email": EmailField,
             },
             "account1": {
-    			"number": fields.IntegerField,
-    			"balance": fields.DecimalField(max_digits=10, decimal_places=2),
+    			"number": IntegerField,
+    			"balance": DecimalField(max_digits=10, decimal_places=2),
             },
-    		"date_joined": fields.DateTimeField,
+    		"date_joined": DateTimeField,
         })
 
 And this is what it looks like after rendered without style:
@@ -36,12 +36,12 @@ It looks and works just like an ordinary form, with validation enabled. When you
 Usage
 ------
 
-`JSONFormFieldEx` constructor takes two arguments:
+`JSONFormFieldEx` constructor takes two arguments itself, along with **kwargs to pass to its parent class `forms.Field`:
 
-* `fields`: a dict of fields
-You can provide either field type or field instance for each field.
+* `fields`: a dict of fields  
+You can provide either field type or field instance for each field. `Fields` also supports SortedDict or [(k,v)...] to preserve ordering of fields.
 
-* `allow_json_input`: True|False
+* `allow_json_input`: True|False  
 If True, it will render an additional textarea allowing user to enter arbitary json string (just like jsonfield)
 
 Note: when `fields` is empty, `allow_json_input` will be automatically set to True
