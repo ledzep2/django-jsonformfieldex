@@ -213,6 +213,52 @@ class WidgetTest(TestCase):
             "settings": target
         }, f.cleaned_data)
 
+    def test_empty(self):
+        target = {
+            "a": u"asdf",
+            "b": u"",
+            "c": None
+        }
+        d = dict(('settings_' + k, str(v)) for k, v in target.iteritems())
+        d.pop('settings_c')
+
+        class F(Form):
+            settings = JSONFormFieldEx({
+                "a": fields.CharField,
+                "b": fields.CharField(required=False),
+                "c": fields.IntegerField(required=False),
+            }, allow_empty=True, allow_json_input=False)
+
+        f = F()
+        html = unicode(f)
+        for i in d:
+            self.assertTrue(html.find('name="%s"' % i) > -1)
+
+        f = F(d)
+        self.assertTrue(f.is_valid())
+        self.assertDictEqual({
+            "settings": target
+        }, f.cleaned_data)
+
+        ######
+        class F(Form):
+            settings = JSONFormFieldEx({
+                "a": fields.CharField,
+                "b": fields.CharField(required=False),
+                "c": fields.IntegerField(required=False),
+            }, allow_empty=False, allow_json_input=False)
+
+        f = F()
+        html = unicode(f)
+        for i in d:
+            self.assertTrue(html.find('name="%s"' % i) > -1)
+
+        f = F(d)
+        self.assertTrue(f.is_valid())
+        self.assertDictEqual({
+            "settings": {'a': u'asdf'}
+        }, f.cleaned_data)
+
 
     def testx(self):
         class MyCustomer(Form):
@@ -230,5 +276,5 @@ class WidgetTest(TestCase):
             })
 
         f = MyCustomer()
-        f1=open('1.html', 'w')
-        print f
+        #f1=open('1.html', 'w')
+        #print f

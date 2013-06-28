@@ -36,11 +36,18 @@ class JSONFormFieldEx(Field):
             for k, v in iterhelper(f):
                 if isinstance(v, (dict, tuple, list)):
                     _clean(v, _values.get(k, {}))
+                    if not self.allow_empty and not _values.get(k):
+                        _values.pop(k)
                 else:
                     try:
                         tmp = _values.get(k, None)
                         v.clean(tmp)
-                        _values[k] = v.to_python(tmp)
+                        tmp = v.to_python(tmp)
+                        if self.allow_empty:
+                            _values[k] = tmp
+                        elif not tmp:
+                            _values.pop(k)
+
                     except FormValidationError, e:
                         errors.extend(map(lambda x,y:x+y, [u'%s %s: ' % (_("Field"), k)] * len(e.messages), e.messages))
 
@@ -51,8 +58,9 @@ class JSONFormFieldEx(Field):
 
         return fields_value
 
-    def __init__(self, fields={}, allow_json_input=True, **kwargs):
+    def __init__(self, fields={}, allow_json_input=True, allow_empty = True, **kwargs):
         self.fields, self.widgets = self.construct_fields_and_widgets(fields)
+        self.allow_empty = allow_empty
         # Don't allow other widgets, coz only JSONWidget returns what we need.
         # Namely django.contrib.admin will try to override the our widget
         kwargs['widget'] = JSONWidget(self.widgets, allow_json_input)
